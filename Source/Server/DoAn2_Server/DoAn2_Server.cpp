@@ -1,7 +1,4 @@
-﻿// Server.cpp : Defines the entry point for the console application.
-//
-
-#include "stdafx.h"
+﻿#include "stdafx.h"
 #include "resource.h"
 #include "afxsock.h"
 #include "math.h"
@@ -10,25 +7,57 @@
 #include <fstream>
 #include <iostream>
 #include <vector>
+
 using namespace std;
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
 #endif
 
-
-// The one and only application object
-using namespace std;
 CWinApp theApp;
+
+void TextColor(WORD color)
+{
+	HANDLE hConsoleOutput;
+	hConsoleOutput = GetStdHandle(STD_OUTPUT_HANDLE);
+
+	CONSOLE_SCREEN_BUFFER_INFO screen_buffer_info;
+	GetConsoleScreenBufferInfo(hConsoleOutput, &screen_buffer_info);
+
+	WORD wAttributes = screen_buffer_info.wAttributes;
+	color &= 0x000f;
+	wAttributes &= 0xfff0;
+	wAttributes |= color;
+
+	SetConsoleTextAttribute(hConsoleOutput, wAttributes);
+}
+
+void FixConsoleWindow() {
+	HWND consoleWindow = GetConsoleWindow();
+	LONG style = GetWindowLong(consoleWindow, GWL_STYLE);
+	style = style & ~(WS_MAXIMIZEBOX) & ~(WS_THICKFRAME);
+	SetWindowLong(consoleWindow, GWL_STYLE, style);
+}
+
+void GotoXY(int x, int y) {
+	COORD coord;
+	coord.X = x;
+	coord.Y = y;
+	SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), coord);
+}
 
 struct Name
 {
 	string User;
 	string Pass;
 };
+struct Ngay
+{
+	string day;
+};
 struct KQSX
 {
-	string ngay;
+	string TenTinhThanh;
 	string GiaiDB;
 	string GiaiNhat;
 	string GiaiNhi;
@@ -54,6 +83,7 @@ vector<string> Tokenizer::Split(const string& s, const char delim)
 
 	return result;
 }
+
 string Parse(string s)
 {
 	vector<string> parts = Tokenizer::Split(s, '	');
@@ -61,37 +91,47 @@ string Parse(string s)
 	a = parts[1];
 	return a;
 }
-string  TimKQSX(string TenTinhThanh, string ngay)
+
+bool CheckNgay(char* Day)
 {
-	KQSX *a = new KQSX[2];
-
 	ifstream f;
-
-	if (TenTinhThanh == "PhuYen")
-		f.open("PhuYen.txt");
-	if (TenTinhThanh == "BinhDuong")
-		f.open("BinhDuong.txt");
-	if (TenTinhThanh == "BinhPhuoc")
-		f.open("BinhPhuoc.txt");
-	if (TenTinhThanh == "BinhThuan")
-		f.open("BinhThuan.txt");
-	if (TenTinhThanh == "DongNai")
-		f.open("DongNai.txt");
-	if (TenTinhThanh == "LongAn")
-		f.open("LongAn.txt");
-	if (TenTinhThanh == "MienBac")
-		f.open("MienBac.txt");
-	if (TenTinhThanh == "NinhThuan")
-		f.open("NinhThuan.txt");
-	if (TenTinhThanh == "QuangNgai")
-		f.open("QuangNgai.txt");
-	if (TenTinhThanh == "TpHCM")
-		f.open("TpHCM.txt");
-	if (TenTinhThanh == "VungTau")
-		f.open("VungTau.txt");
-	for (int i = 0; i < 2; i++)
+	f.open("DanhSachNgay.txt");
+	Ngay* ngay = new Ngay[7];
+	for (int i = 0; i < 7; i++)
 	{
-		getline(f, a[i].ngay);
+		getline(f, ngay[i].day);
+	}
+	for (int i = 0; i < 7; i++)
+	{
+		if (ngay[i].day == Day)
+		{
+			return true;
+		}
+	}
+	return false;
+}
+
+string TimKQSX(string Ngay, string TenTinhThanh)
+{
+	KQSX* a = new KQSX[8];
+	ifstream f;
+	if (Ngay == "12-02-2020")
+		f.open("12-02-2020.txt");
+	if (Ngay == "13-02-2020")
+		f.open("13-02-2020.txt");
+	if (Ngay == "14-02-2020")
+		f.open("14-02-2020.txt");
+	if (Ngay == "15-02-2020")
+		f.open("15-02-2020.txt");
+	if (Ngay == "16-02-2020")
+		f.open("16-02-2020.txt");
+	if (Ngay == "17-02-2020")
+		f.open("17-02-2020.txt");
+	if (Ngay == "18-02-2020")
+		f.open("18-02-2020.txt");
+	for (int i = 0; i < 8; i++)
+	{
+		getline(f, a[i].TenTinhThanh);
 		getline(f, a[i].GiaiDB);
 		getline(f, a[i].GiaiNhat);
 		getline(f, a[i].GiaiNhi);
@@ -102,48 +142,40 @@ string  TimKQSX(string TenTinhThanh, string ngay)
 		getline(f, a[i].GiaiBay);
 		getline(f, a[i].GiaiTam);
 	}
-	for (int i = 0; i < 2; i++)
+	for (int i = 0; i < 8; i++)
 	{
-		if (a[i].ngay == ngay)
+		if (a[i].TenTinhThanh == TenTinhThanh)
 		{
-			return (a[i].ngay+ "\n"+a[i].GiaiDB+"\n"+a[i].GiaiNhat+"\n"+a[i].GiaiNhi+"\n"+a[i].GiaiBa+"\n"+a[i].GiaiTu+"\n"+a[i].GiaiNam+"\n"+a[i].GiaiSau+"\n"+a[i].GiaiBay+"\n"+a[i].GiaiTam+"\n");
+			return (a[i].TenTinhThanh + "\n" + a[i].GiaiDB + "\n" + a[i].GiaiNhat + "\n" + a[i].GiaiNhi + "\n" + a[i].GiaiBa + "\n" + a[i].GiaiTu + "\n" + a[i].GiaiNam + "\n" + a[i].GiaiSau + "\n" + a[i].GiaiBay + "\n" + a[i].GiaiTam + "\n");
 		}
 	}
 	return ("Ket qua mo thuong khong co");
 }
 
-string KiemTraVeSo(string TenTinhThanh, string Ve, string ngay)
+string KiemTraVeSo(string Ngay, string Tentinhthanh, string Sove)
 {
 	string GiaiTrung = "Chuc ban may mam lan sau";
 	ifstream f;
+	int indexColor = 0;
+	KQSX* a = new KQSX[10];
 
-	KQSX *a = new KQSX[10];
-
-	if (TenTinhThanh == "PhuYen")
-		f.open("PhuYen.txt");
-	if (TenTinhThanh == "BinhDuong")
-		f.open("BinhDuong.txt");
-	if (TenTinhThanh == "BinhPhuoc")
-		f.open("BinhPhuoc.txt");
-	if (TenTinhThanh == "BinhThuan")
-		f.open("BinhThuan.txt");
-	if (TenTinhThanh == "DongNai")
-		f.open("DongNai.txt");
-	if (TenTinhThanh == "LongAn")
-		f.open("LongAn.txt");
-	if (TenTinhThanh == "MienBac")
-		f.open("MienBac.txt");
-	if (TenTinhThanh == "NinhThuan")
-		f.open("NinhThuan.txt");
-	if (TenTinhThanh == "QuangNgai")
-		f.open("QuangNgai.txt");
-	if (TenTinhThanh == "TpHCM")
-		f.open("TpHCM.txt");
-	if (TenTinhThanh == "VungTau")
-		f.open("VungTau.txt");
-	for (int i = 0; i < 10; i++)
+	if (Ngay == "12-02-2020")
+		f.open("12-02-2020.txt");
+	if (Ngay == "13-02-2020")
+		f.open("13-02-2020.txt");
+	if (Ngay == "14-02-2020")
+		f.open("14-02-2020.txt");
+	if (Ngay == "15-02-2020")
+		f.open("15-02-2020.txt");
+	if (Ngay == "16-02-2020")
+		f.open("16-02-2020.txt");
+	if (Ngay == "17-02-2020")
+		f.open("17-02-2020.txt");
+	if (Ngay == "18-02-2020")
+		f.open("18-02-2020.txt");
+	for (int i = 0; i < 8; i++)
 	{
-		getline(f, a[i].ngay);
+		getline(f, a[i].TenTinhThanh);
 		getline(f, a[i].GiaiDB);
 		a[i].GiaiDB = Parse(a[i].GiaiDB);
 		getline(f, a[i].GiaiNhat);
@@ -163,47 +195,47 @@ string KiemTraVeSo(string TenTinhThanh, string Ve, string ngay)
 		getline(f, a[i].GiaiTam);
 		a[i].GiaiTam = Parse(a[i].GiaiTam);
 	}
-	for (int i = 0; i < 10; i++)
+	for (int i = 0; i < 8; i++)
 	{
-		if (a[i].ngay == ngay)
+		if (a[i].TenTinhThanh == Tentinhthanh)
 		{
-			if (Ve == a[i].GiaiDB)
-				GiaiTrung = "Woah! chuc mung ban da trung giai Dat Biet tri gia 1,5ty vnd";
+			if (Sove == a[i].GiaiDB)
+				GiaiTrung = "Woah! chuc mung ban da trung giai Dac biet tri gia 2.000.000.000 vnd";
 			else
 			{
-				if ((stoi(Ve) % 100000) == stoi(a[i].GiaiNhat))
+				if ((stoi(Sove) % 100000) == stoi(a[i].GiaiNhat))
 					GiaiTrung = "GiaiNhat";
 				else
 				{
 
-					if ((stoi(Ve) % 100000) == stoi(a[i].GiaiNhi))
+					if ((stoi(Sove) % 100000) == stoi(a[i].GiaiNhi))
 						GiaiTrung = "GiaiNhi";
 					else
 					{
 						vector<string> parts = Tokenizer::Split(a[i].GiaiBa, '-');
-						if ((stoi(Ve) % 100000) == stoi(parts[0]) || (stoi(Ve) % 100000) == stoi(parts[1]))
+						if ((stoi(Sove) % 100000) == stoi(parts[0]) || (stoi(Sove) % 100000) == stoi(parts[1]))
 							GiaiTrung = "GiaiBa";
 						else
 						{
 							vector<string> parts = Tokenizer::Split(a[i].GiaiTu, '-');
-							if ((stoi(Ve) % 100000) == stoi(parts[0]) || (stoi(Ve) % 100000) == stoi(parts[1]) || (stoi(Ve) % 100000) == stoi(parts[2]) || (stoi(Ve) % 100000) == stoi(parts[3]) || (stoi(Ve) % 100000) == stoi(parts[4]) || (stoi(Ve) % 100000) == stoi(parts[5]) || (stoi(Ve) % 100000) == stoi(parts[6]))
+							if ((stoi(Sove) % 100000) == stoi(parts[0]) || (stoi(Sove) % 100000) == stoi(parts[1]) || (stoi(Sove) % 100000) == stoi(parts[2]) || (stoi(Sove) % 100000) == stoi(parts[3]) || (stoi(Sove) % 100000) == stoi(parts[4]) || (stoi(Sove) % 100000) == stoi(parts[5]) || (stoi(Sove) % 100000) == stoi(parts[6]))
 								GiaiTrung = "GiaiTu";
 							else
 							{
-								if (stoi(Ve) % 10000 == stoi(a[i].GiaiNam))
+								if (stoi(Sove) % 10000 == stoi(a[i].GiaiNam))
 									GiaiTrung = "GiaiNam";
 								else
 								{
 									vector<string> parts1 = Tokenizer::Split(a[i].GiaiSau, '-');
-									if (stoi(Ve) % 10000 == stoi(parts1[0]) || stoi(Ve) % 10000 == stoi(parts1[1]) || stoi(Ve) % 10000 == stoi(parts1[2]))
+									if (stoi(Sove) % 10000 == stoi(parts1[0]) || stoi(Sove) % 10000 == stoi(parts1[1]) || stoi(Sove) % 10000 == stoi(parts1[2]))
 										GiaiTrung = "GiaiSau";
 									else
 									{
-										if (stoi(Ve) % 1000 == stoi(a[i].GiaiBay))
+										if (stoi(Sove) % 1000 == stoi(a[i].GiaiBay))
 											GiaiTrung = "GiaiBay";
 										else
 										{
-											if (stoi(Ve) % 100 == stoi(a[i].GiaiTam))
+											if (stoi(Sove) % 100 == stoi(a[i].GiaiTam))
 												GiaiTrung = "GiaiTam";
 										}
 									}
@@ -215,7 +247,6 @@ string KiemTraVeSo(string TenTinhThanh, string Ve, string ngay)
 			}
 		}
 	}
-
 	return GiaiTrung;
 }
 
@@ -233,7 +264,7 @@ int SaveUser(string user, string pass)
 		a[i].User = "";
 		a[i].Pass = "";
 	}
-	k =-1;
+	k = -1;
 	for (int i = 0; i < n; i++)
 	{
 		f >> m;
@@ -246,7 +277,7 @@ int SaveUser(string user, string pass)
 			return 0;
 		}
 	}
-	
+
 
 	if (k == -1)
 	{
@@ -270,6 +301,7 @@ int SaveUser(string user, string pass)
 	return 1;
 
 }
+
 bool SearchUSer(string user, string pass)
 {
 	ifstream f;
@@ -280,7 +312,7 @@ bool SearchUSer(string user, string pass)
 	Name a[50];
 	while (!f)
 	{
-		
+
 		cout << "tep tin khong ton tai";
 		return false;
 	}
@@ -300,7 +332,7 @@ bool SearchUSer(string user, string pass)
 	k = -1;
 	for (int i = 0; i < n; i++)
 	{
-		if ( a[i].User==user && a[i].Pass == pass )
+		if (a[i].User == user && a[i].Pass == pass)
 		{
 			k = 0;
 			return true;
@@ -308,37 +340,330 @@ bool SearchUSer(string user, string pass)
 	}
 	return false;
 }
-bool SearchTinhThanh(string TinhThanh)
+
+bool SearchTinhThanh(string FileName, string TinhThanh)
 {
 	ifstream f;
-	f.open("DanhSach.txt");
-	string a[11];
-	int n, k;
-	string m, s;
-	while (!f)
+	string a[8];
+	if (FileName == "12-02-2020-TinhThanh")
+		f.open("12-02-2020-TinhThanh.txt");
+	if (FileName == "13-02-2020-TinhThanh")
+		f.open("13-02-2020-TinhThanh.txt");
+	if (FileName == "14-02-2020-TinhThanh")
+		f.open("14-02-2020-TinhThanh.txt");
+	if (FileName == "15-02-2020-TinhThanh")
+		f.open("15-02-2020-TinhThanh.txt");
+	if (FileName == "16-02-2020-TinhThanh")
+		f.open("16-02-2020-TinhThanh.txt");
+	if (FileName == "17-02-2020-TinhThanh")
+		f.open("17-02-2020-TinhThanh.txt");
+	if (FileName == "18-02-2020-TinhThanh")
+		f.open("18-02-2020-TinhThanh.txt");
+	if (!f)
 	{
 		cout << "tep tin khong ton tai";
 		return false;
 	}
-	for(int i = 0; i<11; i++)
+	for (int i = 0; i < 8; i++)
 	{
 		f >> a[i];
 	}
-	for (int i = 0; i < 11; i++)
+	for (int i = 0; i < 8; i++)
 	{
-		if ( a[i] == TinhThanh )
+		if (a[i] == TinhThanh)
 		{
-			k = 0;
 			return true;
 		}
 	}
 	return false;
 }
+
+ifstream Output(string day)
+{
+	ifstream f;
+	string a[8];
+	if (day == "12-02-2020-TinhThanh")
+		f.open("12-02-2020-TinhThanh.txt");
+	if (day == "13-02-2020-TinhThanh")
+		f.open("13-02-2020-TinhThanh.txt");
+	if (day == "14-02-2020-TinhThanh")
+		f.open("14-02-2020-TinhThanh.txt");
+	if (day == "15-02-2020-TinhThanh")
+		f.open("15-02-2020-TinhThanh.txt");
+	if (day == "16-02-2020-TinhThanh")
+		f.open("16-02-2020-TinhThanh.txt");
+	if (day == "17-02-2020-TinhThanh")
+		f.open("17-02-2020-TinhThanh.txt");
+	if (day == "18-02-2020-TinhThanh")
+		f.open("18-02-2020-TinhThanh.txt");
+	if (!f)
+	{
+		cout << "tep tin khong ton tai";
+	}
+	return f;
+}
+
+void Exit(CSocket& server)
+{
+	TextColor(10);
+	cout << "\nExit..." << endl;
+	server.Close();
+
+	exit(0);
+	return;
+}
+
+void SendDay(CSocket& sockClients, char* Ngay)
+{
+	//xử lý ngày vừa nhận
+	char* FileName; //Để lấy ra những tỉnh thành của ngày đã nhập
+	char extend[] = "-TinhThanh";
+	int len1 = strlen(extend);
+	int len2 = strlen(Ngay);
+	int length = len1 + len2 + 1;
+	FileName = Ngay;
+	strcat_s(FileName, length, extend);
+	string myString;
+	myString.assign(Ngay, len2);
+	myString.substr(0, length - len2);
+	ifstream ff = Output(FileName);
+	string ds[8];
+	for (int i = 0; i < 8; i++)
+	{
+		ff >> ds[i];
+		int len_t = strlen(ds[i].c_str());
+		sockClients.Send((char*)&len_t, sizeof(int), 0);
+		sockClients.Send(ds[i].c_str(), len_t, 0);
+	}
+
+}
+
+void TruyVan(CSocket& sockClients, char* Ngay)
+{
+	//xử lý ngày vừa nhận
+	string myString;
+	int size = strlen(Ngay);
+	myString.assign(Ngay, size);
+
+	//cắt ra để lấy ngày
+	string temp = myString.substr(0, 10);
+
+	//int flag = 1;
+	int kq; // kq = kqtv
+	sockClients.Receive((char*)&kq, sizeof(kq), 0);
+	// kq = 1: xuất danh sách tỉnh thành có kqxs ra	
+	// truy van 1 <TenTinhThanh>
+	if (kq == 1)
+	{
+		char* Tentinhthanh;
+		int len_ten;
+		bool isValid;
+		do
+		{
+			//Nhận tên tỉnh thành
+			sockClients.Receive((char*)&len_ten, sizeof(int), 0);
+			Tentinhthanh = new char[len_ten];
+			sockClients.Receive(Tentinhthanh, len_ten, 0);
+			Tentinhthanh[len_ten] = '\0';
+
+			//Kiem tra xem tinh thanh co hop le hay khong
+			isValid = SearchTinhThanh(Ngay, Tentinhthanh);
+			if (isValid == true)
+			{
+				string TraCuu = TimKQSX(temp, Tentinhthanh);
+				int len_tracuu = strlen(TraCuu.c_str());
+				// tra ket qua
+				sockClients.Send((char*)&len_tracuu, sizeof(int), 0);
+				sockClients.Send(TraCuu.c_str(), len_tracuu, 0);
+				//flag = 1;
+			}
+			else
+			{
+				string result = "false";
+				int len_result = strlen(result.c_str());
+				sockClients.Send((char*)&len_result, sizeof(int), 0);
+				sockClients.Send(result.c_str(), len_result, 0);
+				//flag = 0;
+			}
+		} while (isValid == false);
+	}
+
+	// nhận truy vấn 2 từ client
+	if (kq == 2)
+	{
+		char* Tentinhthanh;
+		int len_ten;
+		char* Sove;
+		int len_sove;
+		bool CkTinhThanh;
+		do
+		{
+			// nhận tên tỉnh thành
+			sockClients.Receive((char*)&len_ten, sizeof(int), 0);
+			Tentinhthanh = new char[len_ten];
+			sockClients.Receive(Tentinhthanh, len_ten, 0);
+			Tentinhthanh[len_ten] = '\0';
+
+			sockClients.Receive((char*)&len_sove, sizeof(int), 0);
+			Sove = new char[len_sove];
+			sockClients.Receive(Sove, len_sove, 0);
+			Sove[len_sove] = '\0';
+
+			//Kiểm tra tên tỉnh thành có hợp lệ hay không
+			CkTinhThanh = SearchTinhThanh(Ngay, Tentinhthanh);
+			if (CkTinhThanh == true)
+			{
+				string KiemTra = KiemTraVeSo(temp, Tentinhthanh, Sove);
+				int len_ktra = strlen(KiemTra.c_str());
+				// gửi kết quả của hàm kiểm tra cho client
+				sockClients.Send((char*)&len_ktra, sizeof(int), 0);
+				sockClients.Send(KiemTra.c_str(), len_ktra, 0);
+				//flag = 1;
+			}
+			else
+			{
+				string result = "false";
+				int len_result = strlen(result.c_str());
+				sockClients.Send((char*)&len_result, sizeof(int), 0);
+				sockClients.Send(result.c_str(), len_result, 0);
+				//flag = 0;
+			}
+		} while (CkTinhThanh == false);
+	}
+
+	//
+	if (kq == 3)
+	{
+		Exit(sockClients);
+	}
+	//return flag;
+}
+
+void DangNhap(CSocket& sockClients)
+{
+	int flag;
+	int k, x;
+	char* User;
+	int lenU;
+	char* Pass;
+	int lenP;
+
+	//Các biến để nhận ngày đã nhập từ client
+	char* day;
+	int len_day;
+	int CkDay;
+	sockClients.Receive(&lenU, sizeof(int), 0);
+	User = new char[lenU];
+	sockClients.Receive(User, lenU, 0);
+	User[lenU] = '\0';
+
+	sockClients.Receive(&lenP, sizeof(int), 0);
+	Pass = new char[lenP];
+	sockClients.Receive(Pass, lenP, 0);
+	Pass[lenP] = '\0';
+	// đăng nhập thành công
+	if (SearchUSer(User, Pass) == true)
+	{
+		int rs = 1;
+		sockClients.Send((char*)&rs, sizeof(rs), 0);
+		ifstream ff;
+		ff.open("DanhSachNgay.txt");
+		string ds1[7];
+		for (int i = 0; i < 7; i++)
+		{
+			ff >> ds1[i];
+			int len_t = strlen(ds1[i].c_str());
+			sockClients.Send((char*)&len_t, sizeof(int), 0);
+			sockClients.Send(ds1[i].c_str(), len_t, 0);
+		}
+		// nhận truy vấn ngày của client gửi cho
+		do
+		{
+			sockClients.Receive((char*)&len_day, sizeof(int), 0);
+			day = new char[len_day];
+			sockClients.Receive(day, len_day, 0);
+			day[len_day] = '\0';
+			if (CheckNgay(day) == false)
+			{
+				cout << "Ngay khong hop le. Hay nhap lai" << endl;
+				CkDay = 0;
+				sockClients.Send((char*)&CkDay, sizeof(CkDay), 0);
+			}
+			else
+			{
+				CkDay = 1;
+				sockClients.Send((char*)&CkDay, sizeof(CkDay), 0);
+			}
+		} while (CheckNgay(day) == false);
+
+		int x; // x = h
+		sockClients.Receive((char*)&x, sizeof(x), 0);
+
+		if (x == 1) // x = h = 1
+		{
+			char truyvan23[] = "\n1. <TenTinhThanh> : xem kqxs cua ngay vua nhap \n2. <TenTinhThanh> <SoVe>: de tra cuu giai thuong\n3. <EXIT>: De thoat";
+			int tv23 = strlen(truyvan23);
+			sockClients.Send((char*)&tv23, sizeof(int), 0);
+			sockClients.Send(truyvan23, sizeof(truyvan23), 0);
+			SendDay(sockClients, day);
+			while (1)
+			{
+				TruyVan(sockClients, day);
+			}
+		}
+	}
+	else
+	{
+		int p = 0;
+		sockClients.Send((char*)&p, sizeof(p), 0);
+		return;
+	}
+	//return 1;
+}
+
+void DangKy(CSocket& sockClients)
+{
+	int k, x;
+	char* User;
+	int lenU;
+	char* Pass;
+	int lenP;
+	sockClients.Listen(5);
+	// ---------------------------------------
+	// my code
+	// nhận User đã kiểm tra đúng
+
+	sockClients.Receive(&lenU, sizeof(int), 0);
+	User = new char[lenU];
+	sockClients.Receive(User, lenU, 0);
+	User[lenU] = '\0';
+	// nhận pass
+	sockClients.Receive(&lenP, sizeof(int), 0);
+	Pass = new char[lenP];
+	sockClients.Receive(Pass, lenP, 0);
+	Pass[lenP] = '\0';
+
+	if (SaveUser(User, Pass) == 0)
+	{
+		x = 0;
+		cout << "   Dang ki khong thanh cong. Tai khoan da duoc dang ki" << endl;
+		sockClients.Send((char*)&x, sizeof(int), 0);
+	}
+	else
+	{
+		x = 1;
+		k = 2;
+		cout << "   Dang ki thanh cong" << endl;
+		sockClients.Send((char*)&x, sizeof(int), 0);
+		DangNhap(sockClients);
+	}
+}
+
 int _tmain(int argc, TCHAR* argv[], TCHAR* envp[])
 {
 	int nRetCode = 0;
 
-	
+
 
 	// initialize MFC and print and error on failure
 	if (!AfxWinInit(::GetModuleHandle(NULL), NULL, ::GetCommandLine(), 0))
@@ -360,27 +685,46 @@ int _tmain(int argc, TCHAR* argv[], TCHAR* envp[])
 		server.Listen(5);
 
 		//Nhap so luong client
-		printf("\n Nhap so luong Client: ");
 		int num_client;
-		scanf_s("%d",&num_client);
-		if(num_client <=0 || num_client >=10)
+		bool isValid;
+		string temp;
+		do
 		{
-			cout<<"Vui long nhap dung so luong"<<endl;
-			goto EXIT;
-			
-		}
-		printf("\n Dang lang nghe ket noi tu Client...\n");
+			cout << "\nNhap so luong Client: ";
+			isValid = true;
+			cin >> temp;
+			if (temp.length() <= 0)
+			{
+				isValid = false;
+				cout << "\nVui long nhap dung so luong hoac dinh dang" << endl;
+			}
+			else
+			{
+				for (int i = 0; i < temp.length(); ++i)
+				{
+					if (temp[i] < 48 || temp[i] > 57)
+						isValid = false;
+				}
+				if (isValid == false)
+				{
+					cout << "\nVui long nhap dung so luong hoac dinh dang" << endl;
+				}
+			}
+		} while (isValid != true);
+		num_client = stoi(temp);
+
+		printf("\nDang lang nghe ket noi tu Client...\n");
 
 		//Tao mang chua cac socket client
-		CSocket* sockClients = new CSocket[50];
-		for(i=0 ; i<num_client; i++)
+		CSocket* sockClients = new CSocket[num_client];
+		for (i = 0; i < num_client; i++)
 		{
 			server.Accept(sockClients[i]);
-			printf("Da tiep nhan client %d/%d\n",i+1,num_client);
+			printf("Da tiep nhan client %d/%d\n", i + 1, num_client);
 			//Bao cho client biet minh la client thu may
-			sockClients[i].Send((char*)&i,sizeof(int),0);
-		
-			int k,x;
+			sockClients[i].Send((char*)&i, sizeof(int), 0);
+
+			int k, x;
 			char* User;
 			int lenU;
 			char* Pass;
@@ -388,189 +732,25 @@ int _tmain(int argc, TCHAR* argv[], TCHAR* envp[])
 			int j = i;
 			// k là giá trị choose
 
-			sockClients[i].Receive((char*)&k,sizeof(k),0);
-			if(k == 1)
+			sockClients[i].Receive((char*)&k, sizeof(k), 0);
+			if (k == 1)
 			{
-DangKi:
-				sockClients[j].Listen(5);
-				// ---------------------------------------
-				// my code
-				// nhận User đã kiểm tra đúng
-
-				sockClients[j].Receive(&lenU,sizeof(int),0);
-				User = new char[lenU];
-				sockClients[i].Receive(User,lenU,0);
-				User[lenU] = '\0';
-				// nhận pass
-				sockClients[j].Receive(&lenP,sizeof(int),0);
-				Pass = new char[lenP];
-				sockClients[j].Receive(Pass,lenP,0);
-				Pass[lenP] = '\0';
-				int k;
-				if(SaveUser(User,Pass) == 0)
+				while (1)
 				{
-					x = 0;
-					cout<<"   Dang ki khong thanh cong. Tai khoan da duoc dang ki"<<endl;				
-					sockClients[j].Send((char*)&x,sizeof(int),0);
-					goto DangKi;
-				}
-				else
-				{
-					x = 1;
-					k = 2;				
-					cout << "   Dang ki thanh cong" << endl;
-					sockClients[j].Send((char*)&x,sizeof(int),0);
-					goto DangNhap;
+					DangKy(sockClients[j]);
 				}
 			}
 			// 2 là đăng nhập
-			if( k == 2)
+			if (k == 2)
 			{
-DangNhap:
-				sockClients[j].Receive(&lenU,sizeof(int),0);
-				User = new char[lenU];
-				sockClients[j].Receive(User,lenU,0);
-				User[lenU] = '\0';
-
-				sockClients[j].Receive(&lenP,sizeof(int),0);
-				Pass = new char[lenP];
-				sockClients[j].Receive(Pass,lenP,0);
-				Pass[lenP] = '\0';
-				// dang nhập thành công
-				if(SearchUSer(User,Pass) == true)
+				while (1)
 				{
-					int p = 1;
-					sockClients[j].Send((char*)&p,sizeof(p),0);
-					// nhận truy vấn ngày của client gởi cho
-					char* day;
-					int len_day;
-					sockClients[j].Receive((char*)&len_day,sizeof(int),0);
-					day = new char[len_day];
-					sockClients[j].Receive(day,len_day,0);
-					day[len_day] = '\0';
-					// day là để truy vấn xem hôm đó có kqxs của tỉnh nào
-					
-					// nhận truy vấn h
-					int x; // x = h
-
-					sockClients[j].Receive((char*)&x,sizeof(x),0);
-					if( x == 1) // x = h = 1
-					{
-						// gởi hướng dẫn truy vấn 2 & 3 và tỉnh thành xs trong ngày
-						char truyvan23[] = "1. <DS> : de nhan cac tinh thanh co kqxs\n2. <TenTinhThanh> <Ngay Can Tra Cuu> : xem kqxs cua ngay can tran cuu \n3. <TenTinhThanh> <SoVe> <NgayCanTraCuu>: de tra cuu giai thuong\n4. <EXIT>: De thoat";
-						int tv23 = strlen(truyvan23);
-						sockClients[j].Send((char*)&tv23,sizeof(int),0);
-						sockClients[j].Send(truyvan23,sizeof(truyvan23),0);
-TruyVan:
-						// nhận kết quả truy vấn
-						int kq; // kq = kqtv
-						sockClients[j].Receive((char*)&kq,sizeof(kq),0);
-						// kq = 1: xuất danh sách tỉnh thành có kqxs ra
-						if(kq == 1)
-						{
-							ifstream ff;
-							ff.open("DanhSach.txt");
-							string ds1[11];
-							for(int i=0; i<11; i++)
-							{
-								ff>>ds1[i];
-								int len_t = strlen(ds1[i].c_str());
-								sockClients[j].Send((char*)&len_t,sizeof(int),0);
-								sockClients[j].Send(ds1[i].c_str(),len_t,0);
-							}
-							goto TruyVan;
-						}
-						// truy van 2 <TenTinhThanh>
-						if(kq==2)
-						{
-							char* Tentinhthanh;
-							int len_ten;
-							char* Ngay;
-							int len_ngay;
-
-							sockClients[j].Receive((char*)&len_ten,sizeof(int),0);
-							Tentinhthanh = new char[len_ten];
-							sockClients[j].Receive(Tentinhthanh,len_ten,0);
-							Tentinhthanh[len_ten] = '\0';
-							
-							sockClients[j].Receive((char*)&len_ngay,sizeof(int),0);
-							Ngay = new char[len_ngay];
-							sockClients[j].Receive(Ngay,len_ngay,0);
-							Ngay[len_ngay] = '\0';
-
-							string TraCuu= TimKQSX(Tentinhthanh,Ngay);
-							int len_tracuu=strlen(TraCuu.c_str());
-							// tra ket qua
-							sockClients[j].Send((char*)&len_tracuu,sizeof(int),0);
-							sockClients[j].Send(TraCuu.c_str(),len_tracuu,0);
-							goto TruyVan;
-						}
-						// nhận truy vấn 3 từ client
-						if(kq == 3)
-						{
-							char* Tentinhthanh;
-							int len_ten;
-							char* Sove;
-							int len_sove;
-							char* Ngay;
-							int len_ngay;
-							// nhận từ client
-							sockClients[j].Receive((char*)&len_ten,sizeof(int),0);
-							Tentinhthanh = new char[len_ten];
-							sockClients[j].Receive(Tentinhthanh,len_ten,0);
-							Tentinhthanh[len_ten] = '\0';
-
-							
-							sockClients[j].Receive((char*)&len_sove,sizeof(int),0);
-							Sove = new char[len_sove];
-							sockClients[j].Receive(Sove,len_sove,0);
-							Sove[len_sove] = '\0';
-							
-							sockClients[j].Receive((char*)&len_ngay,sizeof(int),0);
-							Ngay = new char[len_ngay];
-							sockClients[j].Receive(Ngay,len_ngay,0);
-							Ngay[len_ngay] = '\0';
-
-							string KiemTra = KiemTraVeSo(Tentinhthanh,Sove,Ngay);
-							int len_ktra = strlen(KiemTra.c_str());
-							// gởi kết quả của hàm KIểmTraVeSo cho client
-							sockClients[j].Send((char*)&len_ktra,sizeof(int),0);
-							sockClients[j].Send(KiemTra.c_str(),len_ktra,0);
-
-							goto TruyVan;
-						}
-						// nhận truy vấn 4 từ client
-
-					}
-
-
-				}
-				// đăng nhập thất bại
-				else
-				{
-					int p = 0;
-					sockClients[j].Send((char*)&p,sizeof(p),0);
-					goto DangNhap;
+					DangNhap(sockClients[j]);
 				}
 			}
-
-				
-			
-
-
-			// ---------------------------------------
-		
-		// ngắt kết nối
-		sockClients[i].Close();
 		}
-EXIT:
-		
-		cout<<"Exit..."<<endl;
-
-		
+		server.Close();
 		getchar();
+		return nRetCode;
 	}
-	
-	getchar();
-	return nRetCode;
 }

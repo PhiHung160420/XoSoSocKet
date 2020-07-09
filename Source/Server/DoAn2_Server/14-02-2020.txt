@@ -1,4 +1,4 @@
-19/5
+BenTre
 Giai DB	864529
 Giai Nhat	04876
 Giai Nhi	27067
@@ -8,7 +8,7 @@ Giai nam	1232
 Giai sau	9826-0579-8592
 Giai bay	203
 Giai tam	99
-12/5
+TayNinh
 Giai DB	274224
 Giai Nhat	59484
 Giai Nhi	97699
@@ -18,7 +18,7 @@ Giai nam	2893
 Giai sau	5312-1686-3277
 Giai bay	421
 Giai tam	37
-5/5
+CaMau
 Giai DB	832217
 Giai Nhat	24871
 Giai Nhi	24369
@@ -28,7 +28,7 @@ Giai nam	5380
 Giai sau	7697-5334-6130
 Giai bay	678
 Giai tam	49
-28/4
+BinhDuong
 Giai DB	441844
 Giai Nhat	86672
 Giai Nhi	99765
@@ -38,7 +38,7 @@ Giai nam	7643
 Giai sau	9430-7039-3521
 Giai bay	832
 Giai tam	96
-21/4
+PhanThiet
 Giai DB	324357
 Giai Nhat	15055
 Giai Nhi	03177
@@ -48,7 +48,7 @@ Giai nam	7951
 Giai sau	7352-2266-7856
 Giai bay	448
 Giai tam	70
-14/4
+Hue
 Giai DB	367358
 Giai Nhat	45203
 Giai Nhi	93350
@@ -58,7 +58,7 @@ Giai nam	7566
 Giai sau	2510-2417-4992
 Giai bay	695
 Giai tam	60
-7/4
+BacNinh
 Giai DB	246646
 Giai Nhat	57478
 Giai Nhi	46199
@@ -68,7 +68,7 @@ Giai nam	5578
 Giai sau	9352-5215-6834
 Giai bay	711
 Giai tam	17
-31/3
+BinhThuan
 Giai DB	021692
 Giai Nhat	71967
 Giai Nhi	54374
@@ -78,23 +78,3 @@ Giai nam	4865
 Giai sau	4226-0134-9302
 Giai bay	419
 Giai tam	05
-24/3
-Giai DB	361063
-Giai Nhat	68313
-Giai Nhi	23744
-Giai ba	78496-59099
-Giai tu	45484-00541-42009-62740-07078-55353-27578
-Giai nam	3148
-Giai sau	1162-9917-1575
-Giai bay	044
-Giai tam	78
-17/3
-Giai DB	197734
-Giai Nhat	24320
-Giai Nhi	75271
-Giai ba	42087-06874
-Giai tu	35627-45071-59489-53833-80774-52618-41558
-Giai nam	8867
-Giai sau	4793-0897-4476
-Giai bay	740
-Giai tam	52

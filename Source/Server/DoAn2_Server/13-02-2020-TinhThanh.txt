@@ -1,0 +1,8 @@
+TPHCM
+DongNai
+BinhPhuoc
+NhaTrang
+CanTho
+DaLat
+Hue
+HaNoi

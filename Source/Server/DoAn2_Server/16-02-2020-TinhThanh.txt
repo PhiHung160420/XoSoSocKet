@@ -1,0 +1,8 @@
+BinhThuan
+BinhPhuoc
+BinhDuong
+BinhDinh
+DaLat
+BacNinh
+KiengGiang
+HaNoi
